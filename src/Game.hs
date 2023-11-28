@@ -2,6 +2,7 @@
 module Game(module Game) where
 import GHC.ForeignPtr (ForeignPtrContents(PlainForeignPtr))
 import Data.Data (repConstr)
+import Data.Maybe (listToMaybe)
 
 {- Board and counters definition -}
 {- In our case, we represent a board as a function from column IDs to lists of tokens.
@@ -30,13 +31,28 @@ togglePlayer Yellow = Red
 
 {- Q1(a): emptyBoard -}
 emptyBoard :: RowCount -> ColCount -> Board
-emptyBoard rows cols = MkBoard { board = replicate rows (replicate cols []), numRows = rows, numCols = cols}
+emptyBoard rows cols = MkBoard { board = replicate cols [], numRows = rows, numCols = cols}
 
 {- Q1(b): getCounter
  - Gets the counter at the given co-ordinates (or Nothing if there is no counter there).
  - Raises an error if co-ordinates are out-of-bounds. -}
+
+getBoard :: Board -> [[Player]]
+getBoard= board
+
+getRowNum :: Board -> Int
+getRowNum = numRows
+
+getColNum :: Board -> Int
+getColNum = numCols
+
+toMaybe :: a -> Maybe a
+toMaybe = Just
+
 getCounter :: Board -> RowID -> ColumnID -> Maybe Player
-getCounter b r c = undefined
+getCounter b r c
+    | r < 0 || r > getRowNum b || c < 0 || c > getColNum b = error "Coordinates out of bounds!"
+    | otherwise =  toMaybe ((getBoard b !! r) !! c)
 
 {- Q1(c): getRow
  - Retrieves the list of counters on the given row -}
