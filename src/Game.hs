@@ -1,5 +1,7 @@
 {- Game logic / win checking -}
 module Game(module Game) where
+import GHC.ForeignPtr (ForeignPtrContents(PlainForeignPtr))
+import Data.Data (repConstr)
 
 {- Board and counters definition -}
 {- In our case, we represent a board as a function from column IDs to lists of tokens.
@@ -28,7 +30,7 @@ togglePlayer Yellow = Red
 
 {- Q1(a): emptyBoard -}
 emptyBoard :: RowCount -> ColCount -> Board
-emptyBoard rows cols = MkBoard { board = replicate rows (replicate cols Yellow), numRows = rows, numCols = cols }
+emptyBoard rows cols = MkBoard { board = replicate rows (replicate cols []), numRows = rows, numCols = cols}
 
 {- Q1(b): getCounter
  - Gets the counter at the given co-ordinates (or Nothing if there is no counter there).
