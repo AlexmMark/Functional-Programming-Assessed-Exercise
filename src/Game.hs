@@ -28,7 +28,7 @@ togglePlayer Yellow = Red
 
 {- Q1(a): emptyBoard -}
 emptyBoard :: RowCount -> ColCount -> Board
-emptyBoard rs cs = undefined
+emptyBoard rs cs = MkBoard Player rs cs
 
 {- Q1(b): getCounter
  - Gets the counter at the given co-ordinates (or Nothing if there is no counter there).
