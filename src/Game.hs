@@ -3,11 +3,12 @@ module Game(module Game) where
 import GHC.ForeignPtr (ForeignPtrContents(PlainForeignPtr))
 import Data.Data (repConstr)
 import Data.Maybe (listToMaybe)
+-- import Options.Applicative.Help (column, rangle)
 
 {- Board and counters definition -}
 {- In our case, we represent a board as a function from column IDs to lists of tokens.
  - These are sparse and grow upwards. -}
-{- Row indices again begin at the bottom left and grow upwards -} 
+{- Row indices again begin at the bottom left and grow upwards -}
 type RowID = Int
 type ColumnID = Int
 type RowCount = Int
@@ -37,8 +38,29 @@ emptyBoard rows cols = MkBoard { board = replicate cols [], numRows = rows, numC
  - Gets the counter at the given co-ordinates (or Nothing if there is no counter there).
  - Raises an error if co-ordinates are out-of-bounds. -}
 
+getCounter :: Board -> RowID -> ColumnID -> Maybe Player
+getCounter b r c
+    | r < 0 || r > (numRows b-1) || c < 0 || c > (numCols b-1) = error "Coordinates out of bounds!" --Accessor methods?
+    | otherwise =  do
+        toMaybeListElement (getBoard b !! c) r
+
+
+{- Q1(c): getRow
+ - Retrieves the list of counters on the given row -}
+getRow :: Board -> RowID -> [Maybe Player]
+getRow b r
+    | r < 0 || r > getRowNum b = error "Coordinates out of bounds!"
+    | otherwise = map (\colID ->  getCounter b r colID) [0 .. numCols b-1]
+
+{- Q1(d): getColumn
+ - Retrieves the list of counters in the given column, from top-to-bottom -}
+getColumn :: Board -> ColumnID -> PaddedColumn
+getColumn b c = undefined
+
+-- Helper
+
 getBoard :: Board -> [[Player]]
-getBoard= board
+getBoard = board
 
 getRowNum :: Board -> Int
 getRowNum = numRows
@@ -46,23 +68,10 @@ getRowNum = numRows
 getColNum :: Board -> Int
 getColNum = numCols
 
-toMaybe :: a -> Maybe a
-toMaybe = Just
-
-getCounter :: Board -> RowID -> ColumnID -> Maybe Player
-getCounter b r c
-    | r < 0 || r > getRowNum b || c < 0 || c > getColNum b = error "Coordinates out of bounds!"
-    | otherwise =  toMaybe ((getBoard b !! r) !! c)
-
-{- Q1(c): getRow
- - Retrieves the list of counters on the given row -}
-getRow :: Board -> RowID -> [Maybe Player]
-getRow b r = undefined
-
-{- Q1(d): getColumn
- - Retrieves the list of counters in the given column, from top-to-bottom -}
-getColumn :: Board -> ColumnID -> PaddedColumn
-getColumn b c = undefined
+toMaybeListElement :: [a] -> Int -> Maybe a
+toMaybeListElement l element
+    | element < 0 || element >= length l = Nothing
+    | otherwise = Just (l !! element)
 
 {- Q2: Show instance -}
 {- Show instance for players -}
