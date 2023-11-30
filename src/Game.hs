@@ -44,8 +44,7 @@ emptyBoard rows cols
 getCounter :: Board -> RowID -> ColumnID -> Maybe Player
 getCounter b r c
     | r < 0 || r > (numRows b-1) || c < 0 || c > (numCols b-1) = error "Coordinates out of bounds!" --Accessor methods?
-    | otherwise =  do
-        toMaybeListElement (getBoard b !! c) r
+    | otherwise = toMaybeListElement (getBoard b !! c) r
 
 
 {- Q1(c): getRow
@@ -101,7 +100,18 @@ instance Show Board where
 {- Drops a counter into the given column. If the move is legal, returns an updated
  - board. Otherwise returns Nothing. -}
 dropCounter :: Board -> ColumnID -> Player -> Maybe Board
-dropCounter b c p = undefined
+dropCounter b c p
+    |c < 0 || c > numCols b = Nothing -- columnID out of bounds
+    | length (board b !! c) > numRows b = Nothing -- Check if the column is already full
+    | otherwise = Just (updateBoard b c p)
+
+-- Helpers
+updateBoard :: Board -> ColumnID -> Player -> Board
+updateBoard b c p = 
+    let newColumn = (board b !! c)
+        newRow = newColumn ++ [p]
+        newBoard =  take c (board b) ++ [newRow] ++ drop (c + 1) (board b)
+    in MkBoard { board = newBoard, numRows = numRows b, numCols = numCols b }
 
 {- Q4: Diagonals -}
 getTLBRDiagonals :: Board -> [[Maybe Player]]
