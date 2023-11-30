@@ -3,6 +3,7 @@ module Game(module Game) where
 import GHC.ForeignPtr (ForeignPtrContents(PlainForeignPtr))
 import Data.Data (repConstr)
 import Data.Maybe (listToMaybe)
+-- import Graphics.Gloss (color)
 -- import Options.Applicative.Help (column, rangle)
 
 {- Board and counters definition -}
@@ -32,7 +33,9 @@ togglePlayer Yellow = Red
 
 {- Q1(a): emptyBoard -}
 emptyBoard :: RowCount -> ColCount -> Board
-emptyBoard rows cols = MkBoard { board = replicate cols [], numRows = rows, numCols = cols}
+emptyBoard rows cols 
+    | rows <= 0 || cols <= 0 = error "Invalid size of rows and columns!" -- make exception?
+    | otherwise = MkBoard { board = replicate cols [], numRows = rows, numCols = cols}
 
 {- Q1(b): getCounter
  - Gets the counter at the given co-ordinates (or Nothing if there is no counter there).
@@ -49,13 +52,15 @@ getCounter b r c
  - Retrieves the list of counters on the given row -}
 getRow :: Board -> RowID -> [Maybe Player]
 getRow b r
-    | r < 0 || r > getRowNum b = error "Coordinates out of bounds!"
-    | otherwise = map (\colID ->  getCounter b r colID) [0 .. numCols b-1]
+    | r < 0 || r > (numRows b-1) = error "Coordinates out of bounds!"
+    | otherwise = map (\rowID ->  getCounter b r rowID) [0 .. numRows b-1]
 
 {- Q1(d): getColumn
  - Retrieves the list of counters in the given column, from top-to-bottom -}
 getColumn :: Board -> ColumnID -> PaddedColumn
-getColumn b c = undefined
+getColumn b c
+    | c < 0 || c > (numCols b-1) = error "Coordinates out of bounds!"
+    | otherwise = map (\colID ->  getCounter b c colID) [0 .. numCols b-1]
 
 -- Helper
 
@@ -70,17 +75,26 @@ getColNum = numCols
 
 toMaybeListElement :: [a] -> Int -> Maybe a
 toMaybeListElement l element
-    | element < 0 || element >= length l = Nothing
+    | element >= length l = Nothing
     | otherwise = Just (l !! element)
 
 {- Q2: Show instance -}
 {- Show instance for players -}
 instance Show Player where
-    show p = undefined
+    show p = playerColor
+        where
+            playerColor = case p of
+                Red -> "R"
+                Yellow -> "Y"
+
 
 {- Instance -}
 instance Show Board where
-    show b = undefined
+    show b = unlines (map showRow [numRows b - 1, numRows b - 2 .. 0])
+        where
+            showRow r = concatMap (showColumns r) [0 .. numCols b - 1]
+                where
+                    showColumns r c = maybe "0" show (getCounter b r c)
 
 {- Q3: Board update -}
 
