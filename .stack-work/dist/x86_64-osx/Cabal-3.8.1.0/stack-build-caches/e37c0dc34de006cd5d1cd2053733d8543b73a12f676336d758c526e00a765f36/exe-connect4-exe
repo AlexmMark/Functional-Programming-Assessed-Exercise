@@ -1,0 +1,16 @@
+/Users/alexmark/.ghcup/ghc/9.4.7/lib/ghc-9.4.7/lib/x86_64-osx-ghc-9.4.7/rts-1.0.2/include/ghcversion.h:
+  hash: ee548d48ca5c94d7c7fab127ec07be47b01afa24d6495358aa9ff6cfc8541c81
+? /Users/alexmark/Documents/Uni/Y4/FP/Functional-Programming-Assessed-Exercise2023/.stack-work/dist/x86_64-osx/Cabal-3.8.1.0/build/connect4-exe/autogen/Paths_connect4.hs
+: hash: e400717ca4146132f59881c14f71cd208ced734fc5b374af5c4de960b073ba10
+? /Users/alexmark/Documents/Uni/Y4/FP/Functional-Programming-Assessed-Exercise2023/.stack-work/dist/x86_64-osx/Cabal-3.8.1.0/build/connect4-exe/autogen/cabal_macros.h
+: hash: 4d42b60b120211681471a806d9014a932bb4a3d02562c52282a9667965387ea8
+/Users/alexmark/Documents/Uni/Y4/FP/Functional-Programming-Assessed-Exercise2023/CHANGELOG.md:
+  hash: 8a7a1b8649c6c0c746149a6152fd84dc6828c8030b2a9da2bd66d681f95a89d6
+/Users/alexmark/Documents/Uni/Y4/FP/Functional-Programming-Assessed-Exercise2023/README.md:
+  hash: 616643c633146ff9e6e0e51667074207ca18eec5981efdf035ddfc99fd802ddd
+/Users/alexmark/Documents/Uni/Y4/FP/Functional-Programming-Assessed-Exercise2023/app/Main.hs:
+  hash: d39823cde3f5babc945c05c51890cef4b9ad562fb25b29ce48f2555c881e233b
+/Users/alexmark/Documents/Uni/Y4/FP/Functional-Programming-Assessed-Exercise2023/connect4.cabal:
+  hash: 743d4a05c50faeb2c5692ad8e2d9c0be80e460f76a5e5b07358ecccd380fbfc3
+/Users/alexmark/Documents/Uni/Y4/FP/Functional-Programming-Assessed-Exercise2023/package.yaml:
+  hash: 2a4f5525e4fc8719c642998f1bdbe9670f750c27dd5dea003ed30f9e2394288e
