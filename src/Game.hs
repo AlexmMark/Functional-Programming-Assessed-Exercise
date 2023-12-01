@@ -107,7 +107,7 @@ dropCounter b c p
 updateBoard :: Board -> ColumnID -> Player -> Board
 updateBoard b c p = 
     let newColumn = (board b !! c)
-        newRow = newColumn ++ [p]
+        newRow = [p] ++ newColumn
         newBoard =  take c (board b) ++ [newRow] ++ drop (c + 1) (board b)
     in MkBoard { board = newBoard, numRows = numRows b, numCols = numCols b }
 
