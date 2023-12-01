@@ -2,7 +2,7 @@
 module Game(module Game) where
 import GHC.ForeignPtr (ForeignPtrContents(PlainForeignPtr))
 import Data.Data (repConstr)
-import Data.Maybe (listToMaybe)
+import Data.Maybe (listToMaybe, maybeToList, catMaybes)
 -- import Graphics.Gloss (color)
 -- import Options.Applicative.Help (column, rangle)
 
@@ -34,7 +34,7 @@ togglePlayer Yellow = Red
 {- Q1(a): emptyBoard -}
 emptyBoard :: RowCount -> ColCount -> Board
 emptyBoard rows cols 
-    | rows <= 0 || cols <= 0 = error "Invalid size of rows and columns!" -- make exception?
+    | rows < 4 || cols < 4 = error "Invalid size of rows and columns!" -- make exception? Shpuld it be greater than 4?
     | otherwise = MkBoard { board = replicate cols [], numRows = rows, numCols = cols}
 
 {- Q1(b): getCounter
@@ -44,7 +44,7 @@ emptyBoard rows cols
 getCounter :: Board -> RowID -> ColumnID -> Maybe Player
 getCounter b r c
     | r < 0 || r > (numRows b-1) || c < 0 || c > (numCols b-1) = error "Coordinates out of bounds!" --Accessor methods?
-    | otherwise = toMaybeListElement (getBoard b !! c) r
+    | otherwise = toMaybeListElement (reverse(board b !! c)) r
 
 
 {- Q1(c): getRow
@@ -52,14 +52,14 @@ getCounter b r c
 getRow :: Board -> RowID -> [Maybe Player]
 getRow b r
     | r < 0 || r > (numRows b-1) = error "Coordinates out of bounds!"
-    | otherwise = map (\rowID ->  getCounter b r rowID) [0 .. numRows b-1]
+    | otherwise = map (getCounter b r) [0 .. numCols b-1]
 
 {- Q1(d): getColumn
  - Retrieves the list of counters in the given column, from top-to-bottom -}
 getColumn :: Board -> ColumnID -> PaddedColumn
 getColumn b c
     | c < 0 || c > (numCols b-1) = error "Coordinates out of bounds!"
-    | otherwise = map (\colID ->  getCounter b c colID) [0 .. numCols b-1]
+    | otherwise = [getCounter b r c |r <- [0 .. numRows b -1]]
 
 -- Helper
 
@@ -89,11 +89,9 @@ instance Show Player where
 
 {- Instance -}
 instance Show Board where
-    show b = unlines (map showRow [numRows b - 1, numRows b - 2 .. 0])
+     show b = unlines (map showRows [(numRows b) - 1, (numRows b) - 2 .. 0])
         where
-            showRow r = concatMap (showColumns r) [0 .. numCols b - 1]
-                where
-                    showColumns r c = maybe "0" show (getCounter b r c)
+            showRows x = concatMap (maybe "0" show) (getRow b x)
 
 {- Q3: Board update -}
 
@@ -114,18 +112,50 @@ updateBoard b c p =
     in MkBoard { board = newBoard, numRows = numRows b, numCols = numCols b }
 
 {- Q4: Diagonals -}
-getTLBRDiagonals :: Board -> [[Maybe Player]]
-getTLBRDiagonals b = undefined
+getTLBRDiagonals :: Board -> [[Maybe Player]] -- Top Left Bottom Right
+getTLBRDiagonals b = [getDiagonals b i | i <- [0.. numRows b + numCols b - 2]]
 
-getBLTRDiagonals :: Board -> [Diagonal]
-getBLTRDiagonals b = undefined
+getBLTRDiagonals :: Board -> [[Maybe Player]]
+getBLTRDiagonals b = 
+    let newBoard = MkBoard { board = reverse (board b), numRows = numRows b, numCols = numCols b}
+    in reverse( getTLBRDiagonals newBoard)
+
+-- Helper
+
+getDiagonals :: Board -> Int -> [Maybe Player]
+getDiagonals b i
+    | i >= 0 = [getCounter b (i - c) c | c <- [0 .. numRows b -1], i-c >= 0, i-c <= numRows b - 1]
+    | otherwise = error "invalid"
 
 {- Q5: Win checking -}
 {- Checks if the given list has a subsequence of length 4, returning Just Player
  - if so, Nothing otherwise -}
 hasFourInRow :: [Maybe Player] -> Maybe Player
-hasFourInRow = undefined
+hasFourInRow [] = Nothing
+hasFourInRow (a:b:c:d:rest)
+    | a == Nothing = hasFourInRow(b:c:d:rest)
+    |equalCounters[a, b, c, d] = a
+    |otherwise = hasFourInRow(b:c:d:rest)
+hasFourInRow _ = Nothing
+
 
 {- Checks all rows, columns, and diagonals for any subsequences of length 4 -}
 checkWin :: Board -> Maybe Player
-checkWin b = undefined
+checkWin b = 
+    let allPatterns = (getBLTRDiagonals b) ++ (getTLBRDiagonals b) ++ (map (getRow b) [0..numRows b -1]) ++ (map (getColumn b) [0..numCols b -1])
+    in findWinner allPatterns
+-- Helper
+
+equalCounters :: Eq a => [a] -> Bool
+equalCounters [] = False
+equalCounters (x : xs) = all (== x) xs
+
+findWinner :: [[Maybe Player]] -> Maybe Player
+findWinner patterns = listToMaybe (catMaybes (map hasFourInRow patterns))
+
+
+ {-    | board b == [] = Nothing
+    | otherwise = 
+        let allPatterns = (getBLTRDiagonals b) ++ (getTLBRDiagonals b) ++ (map getRow b [0..numRows b -1]) ++ (map getColumn b [0..numCols b -1])
+            match = False
+        in-}
