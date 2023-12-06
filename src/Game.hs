@@ -33,7 +33,7 @@ togglePlayer Yellow = Red
 
 {- Q1(a): emptyBoard -}
 emptyBoard :: RowCount -> ColCount -> Board
-emptyBoard rows cols 
+emptyBoard rows cols
     | rows < 4 || cols < 4 = error "Invalid size of rows and columns!" -- make exception? Shpuld it be greater than 4?
     | otherwise = MkBoard { board = replicate cols [], numRows = rows, numCols = cols}
 
@@ -44,7 +44,7 @@ emptyBoard rows cols
 getCounter :: Board -> RowID -> ColumnID -> Maybe Player
 getCounter b r c
     | r < 0 || r > (numRows b-1) || c < 0 || c > (numCols b-1) = error "Coordinates out of bounds!" --Accessor methods?
-    | otherwise = toMaybeListElement (reverse(board b !! c)) r
+    | otherwise = toMaybeListElement (reverse (board b !! c)) r
 
 
 {- Q1(c): getRow
@@ -105,7 +105,7 @@ dropCounter b c p
 
 -- Helpers
 updateBoard :: Board -> ColumnID -> Player -> Board
-updateBoard b c p = 
+updateBoard b c p =
     let newColumn = (board b !! c)
         newRow = [p] ++ newColumn
         newBoard =  take c (board b) ++ [newRow] ++ drop (c + 1) (board b)
@@ -113,18 +113,18 @@ updateBoard b c p =
 
 {- Q4: Diagonals -}
 getTLBRDiagonals :: Board -> [[Maybe Player]] -- Top Left Bottom Right
-getTLBRDiagonals b = [getDiagonals b i | i <- [0.. numRows b + numCols b - 2]]
+getTLBRDiagonals b = [getDiagonals b numOfDiagonals | numOfDiagonals <- [0.. numRows b + numCols b - 2]]
 
 getBLTRDiagonals :: Board -> [[Maybe Player]]
-getBLTRDiagonals b = 
+getBLTRDiagonals b =
     let newBoard = MkBoard { board = reverse (board b), numRows = numRows b, numCols = numCols b}
-    in reverse( getTLBRDiagonals newBoard)
+    in reverse ( getTLBRDiagonals newBoard)
 
 -- Helper
 
 getDiagonals :: Board -> Int -> [Maybe Player]
-getDiagonals b i
-    | i >= 0 = [getCounter b (i - c) c | c <- [0 .. numRows b -1], i-c >= 0, i-c <= numRows b - 1]
+getDiagonals b max
+    | max >= 0 = [getCounter b (max - column) column | column <- [0 .. numRows b - 1], max-column >= 0, max-column <= numRows b - 1]
     | otherwise = error "invalid"
 
 {- Q5: Win checking -}
@@ -133,16 +133,16 @@ getDiagonals b i
 hasFourInRow :: [Maybe Player] -> Maybe Player
 hasFourInRow [] = Nothing
 hasFourInRow (a:b:c:d:rest)
-    | a == Nothing = hasFourInRow(b:c:d:rest)
-    |equalCounters[a, b, c, d] = a
-    |otherwise = hasFourInRow(b:c:d:rest)
+    | a == Nothing = hasFourInRow (b:c:d:rest)
+    |equalCounters [a, b, c, d] = a
+    |otherwise = hasFourInRow (b:c:d:rest)
 hasFourInRow _ = Nothing
 
 
 {- Checks all rows, columns, and diagonals for any subsequences of length 4 -}
 checkWin :: Board -> Maybe Player
-checkWin b = 
-    let allPatterns = (getBLTRDiagonals b) ++ (getTLBRDiagonals b) ++ (map (getRow b) [0..numRows b -1]) ++ (map (getColumn b) [0..numCols b -1])
+checkWin b =
+    let allPatterns = getBLTRDiagonals b ++ getTLBRDiagonals b ++ map (getRow b) [0..numRows b -1] ++ map (getColumn b) [0..numCols b -1]
     in findWinner allPatterns
 -- Helper
 
