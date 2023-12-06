@@ -1,0 +1,7 @@
+
+All questions have been attempted (Q1, Q2, Q3, Q4, Q5, Q6, Q7)
+
+The final product, to my best knowledge, is functioning as intended. 
+
+For the Gloss GUI part, please use Left mouse click on the column you wish to drop a counter in. 
+After a winner is determined, no more counters can be dropped. To start a new game, the application needs to restart.
